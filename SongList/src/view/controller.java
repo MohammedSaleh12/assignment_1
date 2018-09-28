@@ -20,7 +20,7 @@ public class controller {
 	@FXML TextField album;
 	@FXML TextField year;
 	
-	private ObservableList<String> obsList;              
+	private ObservableList<SongDetail> songlist;              
 
 	public void start(Stage mainStage) {                
 		// create an ObservableList 
