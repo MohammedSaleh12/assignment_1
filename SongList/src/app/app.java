@@ -8,7 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import view.controller;
-
+//doing stuff
 public class app extends Application {
 	@Override
 	public void start(Stage primaryStage) 
