@@ -2,13 +2,13 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Text?>
 
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/10.0.1" fx:controller = "view.controller">
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.controller">
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="10.0" prefWidth="313.0" />
   </columnConstraints>
@@ -31,14 +31,14 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <TextArea fx:id="songName" prefHeight="200.0" prefWidth="200.0" promptText="Despacito 2 " GridPane.rowIndex="1" />
-            <TextField alignment="TOP_CENTER" text="NAME" />
-            <TextField alignment="TOP_CENTER" text="ALBUM" GridPane.rowIndex="2" />
-            <TextArea fx:id="albumName" prefHeight="200.0" prefWidth="200.0" promptText="Youtube" GridPane.rowIndex="3" />
-            <TextField alignment="TOP_CENTER" text="ARTIST" GridPane.columnIndex="1" />
-            <TextArea fx:id="artistName" prefHeight="200.0" prefWidth="200.0" promptText="PiwdiePie" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField alignment="TOP_CENTER" text="YEAR" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <TextArea fx:id="year" prefHeight="200.0" prefWidth="200.0" promptText="2018" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="NAME" GridPane.halignment="CENTER" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="ARTIST" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="ALBUM" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="YEAR" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+            <TextField fx:id="album" promptText="Youtube" GridPane.rowIndex="3" />
+            <TextField fx:id="song" promptText="Despacito 2" GridPane.rowIndex="1" />
+            <TextField fx:id="artist" promptText="PewdiePie" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="year" promptText="2018" GridPane.columnIndex="1" GridPane.rowIndex="3" />
          </children>
       </GridPane>
       <GridPane prefHeight="56.0" prefWidth="545.0">
