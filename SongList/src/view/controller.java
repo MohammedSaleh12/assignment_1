@@ -28,6 +28,7 @@ public class controller {
 	private ArrayList<SongDetail> songlist = new ArrayList<SongDetail>();  
 	private ObservableList<String> user_display = FXCollections.observableArrayList();
 	
+	
 	public void start(Stage mainStage) {                
 		// create an ObservableList 
 		// from an ArrayList  
@@ -42,8 +43,7 @@ public class controller {
 	
 	public void add(ActionEvent e) {
 		if(song.getText().isEmpty()  || artist.getText().isEmpty()) {
-			Alert alert = new Alert(AlertType.ERROR);
-			 
+			Alert alert = new Alert(AlertType.ERROR);	 
 			alert.setTitle("'Add' Alert!");
 			alert.setHeaderText("Either song name or artist name missing. Please try again");
 			alert.setContentText("");
@@ -92,6 +92,15 @@ public class controller {
 			for(SongDetail songer : songlist) {
 				user_display.add(songer.GetSongName());
 			}
+			// get the index where it was newly inserted
+			int count = 0;
+			for(SongDetail songdetail : songlist) {
+				if(song.getText().equals(songdetail.GetSongName()) && artist.getText().equals(songdetail.GetArtistName())) {
+					break;
+				}
+				count++;
+			}
+			listView.getSelectionModel().select(count);
 			listView.setItems(user_display);
 
 		
