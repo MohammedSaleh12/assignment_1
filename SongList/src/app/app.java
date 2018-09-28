@@ -17,6 +17,7 @@ public class app extends Application {
 		loader.setLocation(
 				getClass().getResource("/view/GUI.fxml"));
 		GridPane root = (GridPane)loader.load();
+		System.out.println("Hello");
 
 
 		Scene scene = new Scene(root);
