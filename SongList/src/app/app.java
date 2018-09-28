@@ -8,7 +8,8 @@ import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import view.controller;
-//doing stuff
+
+
 public class app extends Application {
 	@Override
 	public void start(Stage primaryStage) 
@@ -17,8 +18,6 @@ public class app extends Application {
 		loader.setLocation(
 				getClass().getResource("/view/GUI.fxml"));
 		GridPane root = (GridPane)loader.load();
-		System.out.println("Hello");
-
 
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);
