@@ -1,7 +1,15 @@
 package view;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
+/*import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+*/
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -12,6 +20,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
 
 public class controller {
 
@@ -28,12 +37,41 @@ public class controller {
 	private ObservableList<String> user_display = FXCollections.observableArrayList();
 	
 	
-	public void start(Stage mainStage) {                
-		listView.getSelectionModel().selectedIndexProperty().addListener((index) -> selectItem(mainStage));
+	public void start(Stage mainStage) {     
+		/*JSONParser parser = new JSONParser();
+		JSONArray arr;
+		try {
+			arr = (JSONArray) parser.parse(new FileReader("c:\\filesystem.json"));
+			for (Object o : arr) {
+				JSONObject song = (JSONObject) o;
+				String name = (String) song.get("name");
+				System.out.println(name);
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+
+		//getting an exception in thread
+		//TODO figure out why there is an exception in thread
+		/*listView.getSelectionModel().selectedIndexProperty().addListener((obs, oldVal, newVal) -> {
+			if (oldVal.intValue() != -1) {
+				selectItem(mainStage);
+			}
+		});*/
 	}
 	
 	private void selectItem(Stage mainStage) {
 		int index = listView.getSelectionModel().getSelectedIndex();
+		if(index < 0) {
+			return;
+		}
 		SongDetail selectedSong = songlist.get(index);
 		song.setText(selectedSong.GetSongName());
 		artist.setText(selectedSong.GetArtistName());
@@ -102,8 +140,9 @@ public class controller {
 				}
 				count++;
 			}
-			listView.getSelectionModel().select(count);
+			
 			listView.setItems(user_display);
+			listView.getSelectionModel().select(count);
 
 		
 	}
