@@ -10,8 +10,7 @@ import javafx.stage.Stage;
 
 public class controller {
 
-	@FXML         
-	ListView<String> listView;                
+	@FXML ListView<String> listView;                
 	@FXML Button add;
 	@FXML Button delete;
 	@FXML Button edit;
@@ -23,15 +22,8 @@ public class controller {
 	private ObservableList<SongDetail> songlist;              
 
 	public void start(Stage mainStage) {                
-		// create an ObservableList 
-		// from an ArrayList  
-		//name.setDisable(true);
-		//artist.setDisable(true);
-		//album.setDisable(true);
-		//year.setDisable(true);
-
+		
 	}
-	
 	
 	
 	public void add(ActionEvent e) {
