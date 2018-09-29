@@ -18,7 +18,10 @@ public class app extends Application {
 		loader.setLocation(
 				getClass().getResource("/view/GUI.fxml"));
 		GridPane root = (GridPane)loader.load();
-
+		
+		controller controller = loader.getController();
+		controller.start(primaryStage);
+		
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);
 		primaryStage.show(); 

@@ -29,9 +29,19 @@ public class controller {
 	
 	
 	public void start(Stage mainStage) {                
-		
+		listView.getSelectionModel().selectedIndexProperty().addListener((index) -> selectItem(mainStage));
 	}
 	
+	private void selectItem(Stage mainStage) {
+		int index = listView.getSelectionModel().getSelectedIndex();
+		SongDetail selectedSong = songlist.get(index);
+		song.setText(selectedSong.GetSongName());
+		artist.setText(selectedSong.GetArtistName());
+		album.setText(selectedSong.GetAlbumName());
+		if(selectedSong.GetYear() != 0){
+			year.setText(""+selectedSong.GetYear());
+		}
+	}
 	
 	public void add(ActionEvent e) {
 		if(song.getText().isEmpty()  || artist.getText().isEmpty()) {
