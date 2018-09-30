@@ -1,15 +1,17 @@
 package view;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-/*import org.json.simple.JSONArray;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-*/
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -38,33 +40,11 @@ public class controller {
 	
 	
 	public void start(Stage mainStage) {     
-		/*JSONParser parser = new JSONParser();
-		JSONArray arr;
-		try {
-			arr = (JSONArray) parser.parse(new FileReader("c:\\filesystem.json"));
-			for (Object o : arr) {
-				JSONObject song = (JSONObject) o;
-				String name = (String) song.get("name");
-				System.out.println(name);
-			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-
+		initListView();
 		//getting an exception in thread
 		//TODO figure out why there is an exception in thread
-		/*listView.getSelectionModel().selectedIndexProperty().addListener((obs, oldVal, newVal) -> {
-			if (oldVal.intValue() != -1) {
-				selectItem(mainStage);
-			}
-		});*/
+		/*listView.getSelectionModel().selectedIndexProperty().addListener((obs, oldVal, newVal) ->
+			selectItem(mainStage));*/
 	}
 	
 	private void selectItem(Stage mainStage) {
@@ -107,22 +87,23 @@ public class controller {
 			}
 			String album_name = album.getText();
 			String song_year = year.getText();
+			SongDetail new_song;
 			// create new SongDetail and input into both songlist and obsonglist.
 			if(album_name.isEmpty() && song_year.isEmpty()) {
-				SongDetail new_song = new SongDetail(song.getText(), artist.getText());
+				new_song = new SongDetail(song.getText(), artist.getText());
 				songlist.add(new_song);
 				user_display.add(new_song.GetSongName());
 			}
 			else if(album_name.isEmpty()) {
-				SongDetail new_song = new SongDetail(song.getText(), artist.getText(), Integer.valueOf(song_year));
+				new_song = new SongDetail(song.getText(), artist.getText(), Integer.valueOf(song_year));
 				songlist.add(new_song);
 			}
 			else if(song_year.isEmpty()) {
-				SongDetail new_song = new SongDetail(song.getText(), artist.getText(), album_name);
+				new_song = new SongDetail(song.getText(), artist.getText(), album_name);
 				songlist.add(new_song);
 			}
 			else {
-				SongDetail new_song = new SongDetail(song.getText(), artist.getText());
+				new_song = new SongDetail(song.getText(), artist.getText());
 				songlist.add(new_song);
 			}
 			songlist = SortSongs(songlist, songlist.size());
@@ -140,9 +121,11 @@ public class controller {
 				}
 				count++;
 			}
-			
+
 			listView.setItems(user_display);
 			listView.getSelectionModel().select(count);
+			
+			UpdateJSONFile(new_song);
 
 		
 	}
@@ -170,6 +153,117 @@ public class controller {
 	
 	public void edit(ActionEvent e) {
 		
+	}
+	
+	private void UpdateJSONFile(SongDetail newSong) {
+		JSONParser parser = new JSONParser();
+		JSONArray songArr;
+		try {
+			//converting JSON file to a JSONArray object
+			File JSONFile = new File("SongLib.json");
+			if (JSONFile.length() == 0) {
+				//file is empty
+				songArr = new JSONArray();
+				
+				FileWriter filewriter = new FileWriter(JSONFile);
+				
+				//creating a new JSONObject that will contain the new song details
+				JSONObject newJSONSong = new JSONObject();
+				newJSONSong.put("song_name", newSong.GetSongName());
+				newJSONSong.put("artist_name", newSong.GetArtistName());
+				newJSONSong.put("album_name", newSong.GetAlbumName());
+				newJSONSong.put("year", Integer.toString(newSong.GetYear()));
+				
+				songArr.add(newJSONSong);
+				filewriter.write(songArr.toString());
+				filewriter.flush();
+				filewriter.close();
+				return;
+			}
+			
+			//file is not empty
+			songArr = (JSONArray) parser.parse(new FileReader(JSONFile));
+			
+			//opening the file
+			FileWriter filewriter = new FileWriter(JSONFile);
+			
+			//creating a new JSONObject that will contain the new song details
+			JSONObject newJSONSong = new JSONObject();
+			newJSONSong.put("song_name", newSong.GetSongName());
+			newJSONSong.put("artist_name", newSong.GetArtistName());
+			newJSONSong.put("album_name", newSong.GetAlbumName());
+			newJSONSong.put("year", Integer.toString(newSong.GetYear()));
+			
+			songArr.add(newJSONSong);
+			filewriter.write(songArr.toJSONString());
+			filewriter.flush();
+			filewriter.close();
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void initListView() {
+		JSONParser parser = new JSONParser();
+		JSONArray songArr;
+		try {
+			//converting JSON file to a JSONArray object
+			File JSONFile = new File("SongLib.json");
+			if (JSONFile.length() == 0) {
+				//file is empty no need to populate listview
+				return;
+			}
+			
+			//file is not empty
+			songArr = (JSONArray) parser.parse(new FileReader(JSONFile));
+			for (Object o : songArr) {
+				JSONObject song = (JSONObject) o;
+				String name = (String) song.get("song_name");
+				String artist = (String) song.get("artist_name");
+				String album = (String) song.get("album_name");
+				int year = Integer.parseInt((String) song.get("year"));
+				
+				user_display.add(name);
+				if(album == null) {
+					if(year == 0) {
+						songlist.add(new SongDetail(name, artist));
+					}else {
+						songlist.add(new SongDetail(name, artist, year));
+					}
+				}else {
+					if(year == 0) {
+						songlist.add(new SongDetail(name, artist, album));
+					}else {
+						songlist.add(new SongDetail(name, artist, album, year));
+					}
+				}
+			}
+			songlist = SortSongs(songlist, songlist.size());
+			// Update user_display for alphabetical order
+			user_display = FXCollections.observableArrayList();
+			for(SongDetail songer : songlist) {
+				user_display.add(songer.GetSongName());
+			}			
+			listView.setItems(user_display);
+			listView.getSelectionModel().select(0);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 
