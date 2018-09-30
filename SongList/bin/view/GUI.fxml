@@ -53,7 +53,7 @@
          <children>
             <Button fx:id="add" mnemonicParsing="false" onAction="#add" text="ADD" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
             <Button fx:id="delete" mnemonicParsing="false" onAction="#delete" text="DELETE" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
-            <Button fx:id="edit" mnemonicParsing="false" text="EDIT" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
+            <Button fx:id="edit" mnemonicParsing="false" onAction="#edit" text="EDIT" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
          </children>
       </GridPane>
    </children>

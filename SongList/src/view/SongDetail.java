@@ -47,4 +47,19 @@ public class SongDetail {
 		return this.year;
 	}
 	
+	public void UpdateSongName(String newSongName) {
+		this.songName = newSongName;
+	}
+	
+	public void UpdateArtistName(String newArtistName) {
+		this.artistName = newArtistName;
+	}
+	
+	public void UpdateAlbumName(String newAlbum) {
+		this.album = newAlbum;
+	}
+	
+	public void UpdateYear(int newYear) {
+		this.year = newYear;
+	}
 }
