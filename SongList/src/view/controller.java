@@ -1,16 +1,7 @@
 package view;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -35,16 +27,24 @@ public class controller {
 	@FXML TextField album;
 	@FXML TextField year;
 	
-	private ArrayList<SongDetail> songlist = new ArrayList<SongDetail>();  
-	private ObservableList<String> user_display = FXCollections.observableArrayList();
-	
+	public ArrayList<SongDetail> songlist = new ArrayList<SongDetail>();  
+	public ObservableList<String> user_display = FXCollections.observableArrayList();
+	public Json jsonFile = new Json("SongLib.json");
 	
 	public void start(Stage mainStage) {     
-		initListView();
+		jsonFile.initListView(songlist, user_display);
+		songlist = SortSongs(songlist, songlist.size());
+		// Update user_display for alphabetical order
+		user_display = FXCollections.observableArrayList();
+		for(SongDetail songer : songlist) {
+			user_display.add(songer.GetSongName());
+		}			
+		listView.setItems(user_display);
+		listView.getSelectionModel().select(0);
 		//getting an exception in thread
 		//TODO figure out why there is an exception in thread
-		/*listView.getSelectionModel().selectedIndexProperty().addListener((obs, oldVal, newVal) ->
-			selectItem(mainStage));*/
+		/*listView.getSelectionModel().selectedItemProperty().addListener((index) -> 
+				selectItem(mainStage));*/
 	}
 	
 	private void selectItem(Stage mainStage) {
@@ -125,7 +125,7 @@ public class controller {
 			listView.setItems(user_display);
 			listView.getSelectionModel().select(count);
 			
-			AddSongToJSONFile(new_song);
+			jsonFile.AddSongToJSONFile(new_song);
 
 		
 	}
@@ -153,26 +153,55 @@ public class controller {
 	
 	public void edit(ActionEvent e) {
 		int index = listView.getSelectionModel().getSelectedIndex();
+		if(index == -1) {
+			// User has not selected anything to edit
+			// Alert User
+			Alert alert = new Alert(AlertType.ERROR);
+			 
+			alert.setTitle("Item not selected");
+			alert.setHeaderText("Please select a song to edit!");
+			alert.setContentText("");
+			 
+			alert.showAndWait();
+			return;
+		}else {
+			// Ask user for confirmation of the edit
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+			 
+			alert.setTitle("Confirmation");
+			alert.setHeaderText("Are you sure you would like to edit this item?");
+			alert.setContentText("");
+			Optional<ButtonType> ans = alert.showAndWait();
+			if(ans.get() == ButtonType.CANCEL) {
+				return;
+			}
+		}
 		SongDetail edit_song = songlist.get(index);
-		if(song.getText().equalsIgnoreCase(edit_song.GetSongName())) {
-			if(artist.getText().equalsIgnoreCase(edit_song.GetArtistName())) {
-				if(album.getText().equalsIgnoreCase(edit_song.GetAlbumName())) {
-					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) == edit_song.GetYear()) {
-						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));
+		if(song.getText().equalsIgnoreCase(edit_song.GetSongName())) {  // Seeing if the selected song name equals the song name in the text field
+			if(artist.getText().equalsIgnoreCase(edit_song.GetArtistName())) {  // Seeing if the selected song's artist name equals the artist name in the text field
+				if(album.getText().length() == 0 || album.getText().equalsIgnoreCase(edit_song.GetAlbumName())) {  // Seeing if the selected song's album name equals the album name in the text field 
+					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) != edit_song.GetYear()) {  // Seeing if the selected song's year equals the year in the text field
+ 						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));  // Updated the year of the selected song
+					}else if(year.getText().length() == 0) {
+						songlist.get(index).UpdateYear(0);
 					}
 				}else {
-					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) == edit_song.GetYear()) {
-						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));
+					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) != edit_song.GetYear()) {
+						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));  // Updated the year of the selected song
+					}else if(year.getText().length() == 0) {
+						songlist.get(index).UpdateYear(0);
 					}
-					songlist.get(index).UpdateAlbumName(album.getText());
+					songlist.get(index).UpdateAlbumName(album.getText());  // Updated the album of the selected song
 				}
 			}else {
-				//first check if the new song if edit will make two items have the same artist name and song name
+				// User has elected to change the artist name of the selected song
+				// First check if the new song if edit will make two items have the same artist name and song name
 				for(SongDetail songDetail : songlist){
-					//check if song name is the same
+					// Check if song name is the same
 					if(songDetail.GetSongName().equalsIgnoreCase(edit_song.GetSongName())) {
 						if(songDetail.GetArtistName().equalsIgnoreCase(artist.getText())) {
-							//there's a duplicate
+							// There's a duplicate
+							// Alert user
 							Alert alert = new Alert(AlertType.ERROR);
 							 
 							alert.setTitle("Found duplicate artist name and song name!");
@@ -184,26 +213,33 @@ public class controller {
 						}
 					}
 				}
-				//no duplicates if edit is completed
-				if(album.getText() == edit_song.GetAlbumName()) {
-					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) == edit_song.GetYear()) {
-						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));
+				// No duplicates if edit is completed
+				if(album.getText().length() == 0 || album.getText().equalsIgnoreCase(edit_song.GetAlbumName())) {
+					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) != edit_song.GetYear()) {
+						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));  // Updated the year of the selected song
+					}else if(year.getText().length() == 0) {
+						songlist.get(index).UpdateYear(0);
 					}
 				}else {
-					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) == edit_song.GetYear()) {
-						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));
+					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) != edit_song.GetYear()) {
+						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));  // Updated the year of the selected song
+					}else if(year.getText().length() == 0) {
+						songlist.get(index).UpdateYear(0);
 					}
-					songlist.get(index).UpdateAlbumName(album.getText());
+					songlist.get(index).UpdateAlbumName(album.getText());  // Updated the album of the selected song
 				}
-				songlist.get(index).UpdateArtistName(artist.getText());
+				songlist.get(index).UpdateArtistName(artist.getText());  // Updated the artist name of the selected song
 			}
 		}else {
 			if(artist.getText().equalsIgnoreCase(edit_song.GetArtistName())) {
+				// User has elected to change just the song name
+				// Need to check if the new song name and artist name are already in the songlist
 				for(SongDetail songDetail : songlist){
-					//check if song name is the same
+					// Check if song name is the same
 					if(songDetail.GetSongName().equalsIgnoreCase(song.getText())) {
 						if(songDetail.GetArtistName().equalsIgnoreCase(edit_song.GetArtistName())) {
-							//there's a duplicate
+							// There's a duplicate
+							// Alert the user
 							Alert alert = new Alert(AlertType.ERROR);
 							 
 							alert.setTitle("Found duplicate artist name and song name!");
@@ -215,23 +251,29 @@ public class controller {
 						}
 					}
 				}
-				if(album.getText().equalsIgnoreCase(edit_song.GetAlbumName())) {
-					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) == edit_song.GetYear()) {
-						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));
+				if(album.getText().length() == 0 || album.getText().equalsIgnoreCase(edit_song.GetAlbumName())) {
+					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) != edit_song.GetYear()) {
+						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));  // Updated the year of the selected song
+					}else if(year.getText().length() == 0) {
+						songlist.get(index).UpdateYear(0);
 					}
 				}else {
-					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) == edit_song.GetYear()) {
-						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));
+					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) != edit_song.GetYear()) {
+						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));  // Updated the year of the selected song
+					}else if(year.getText().length() == 0) {
+						songlist.get(index).UpdateYear(0);
 					}
-					songlist.get(index).UpdateAlbumName(album.getText());
+					songlist.get(index).UpdateAlbumName(album.getText());  //Updated the album of the selected song
 				}
 			}else {
-				//first check if the new song if edit will make two items have the same artist name and song name
+				// User has elected to change the song name and the artist name				
+				// First check if the new song if edit will make two items have the same artist name and song name
 				for(SongDetail songDetail : songlist){
-					//check if song name is the same
+					// Check if song name is the same
 					if(songDetail.GetSongName().equalsIgnoreCase(song.getText())) {
 						if(songDetail.GetArtistName().equalsIgnoreCase(artist.getText())) {
-							//there's a duplicate
+							// There's a duplicate
+							// Alert the user
 							Alert alert = new Alert(AlertType.ERROR);
 							 
 							alert.setTitle("Found duplicate artist name and song name!");
@@ -243,184 +285,39 @@ public class controller {
 						}
 					}
 				}
-				//no duplicates if edit is completed
-				if(album.getText() == edit_song.GetAlbumName()) {
-					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) == edit_song.GetYear()) {
-						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));
+				// No duplicates if edit is completed
+				if(album.getText().length() == 0 || album.getText().equalsIgnoreCase(edit_song.GetAlbumName())) {
+					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) != edit_song.GetYear()) {
+						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));   // Updated the year of the selected song
+					}else if(year.getText().length() == 0) {
+						songlist.get(index).UpdateYear(0);
 					}
 				}else {
-					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) == edit_song.GetYear()) {
-						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));
+					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) != edit_song.GetYear()) {
+						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));  // Updated the year of the selected song
+					}else if(year.getText().length() == 0) {
+						songlist.get(index).UpdateYear(0);
 					}
-					songlist.get(index).UpdateAlbumName(album.getText());
+					songlist.get(index).UpdateAlbumName(album.getText());  // Updated the album of the selected song
 				}
-				songlist.get(index).UpdateArtistName(artist.getText());
+				songlist.get(index).UpdateArtistName(artist.getText());  //Updated the artist name of the selected song
 			}
-			songlist.get(index).UpdateSongName(song.getText());
-			user_display.set(index, song.getText());
+			songlist.get(index).UpdateSongName(song.getText());  //Updated the song name of the selected song
 		}
+		if(album.getText().length() == 0) {
+			songlist.get(index).UpdateAlbumName(null);
+		}
+		SortSongs(songlist, songlist.size());  // Sorted the song list
+		user_display = FXCollections.observableArrayList(); 
+		// Remapping the songs in their new order
+		for(SongDetail song : songlist) {
+			user_display.add(song.GetSongName());
+		}
+		// Updating the listView
 		listView.setItems(user_display);
+		//  Selecting the edited song
 		listView.getSelectionModel().select(index);
-		UpdateJSONFile(edit_song, songlist.get(index));
+		jsonFile.UpdateJSONFile(edit_song, songlist.get(index));  // Updating JSON file
 	}
-	
-	
-	private void UpdateJSONFile(SongDetail editSong, SongDetail newSong) {
-		JSONParser parser = new JSONParser();
-		JSONArray songArr;
-		try {
-			//converting JSON file to a JSONArray object
-			File JSONFile = new File("SongLib.json");
-			songArr = (JSONArray) parser.parse(new FileReader(JSONFile));
-			JSONObject song = new JSONObject();
-			for (Object o : songArr) {
-				song = (JSONObject) o;
-				if(editSong.GetSongName().equalsIgnoreCase((String)song.get("song_name")) &&
-						editSong.GetArtistName().equalsIgnoreCase((String) song.get("artist_name"))){
-					break;
-				}
-			}
-			
-			
-			FileWriter filewriter = new FileWriter(JSONFile);
-			songArr.remove(song);
-			JSONObject newJSONSong = new JSONObject();
-			newJSONSong.put("song_name", newSong.GetSongName());
-			newJSONSong.put("artist_name", newSong.GetArtistName());
-			newJSONSong.put("album_name", newSong.GetAlbumName());
-			newJSONSong.put("year", Integer.toString(newSong.GetYear()));
-			
-			songArr.add(newJSONSong);
-			
-			filewriter.write(songArr.toString());
-			filewriter.flush();
-			filewriter.close();
-			return;
-			
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	private void AddSongToJSONFile(SongDetail newSong) {
-		JSONParser parser = new JSONParser();
-		JSONArray songArr;
-		try {
-			//converting JSON file to a JSONArray object
-			File JSONFile = new File("SongLib.json");
-			if (JSONFile.length() == 0) {
-				//file is empty
-				songArr = new JSONArray();
-				
-				FileWriter filewriter = new FileWriter(JSONFile);
-				
-				//creating a new JSONObject that will contain the new song details
-				JSONObject newJSONSong = new JSONObject();
-				newJSONSong.put("song_name", newSong.GetSongName());
-				newJSONSong.put("artist_name", newSong.GetArtistName());
-				newJSONSong.put("album_name", newSong.GetAlbumName());
-				newJSONSong.put("year", Integer.toString(newSong.GetYear()));
-				
-				songArr.add(newJSONSong);
-				filewriter.write(songArr.toString());
-				filewriter.flush();
-				filewriter.close();
-				return;
-			}
-			
-			//file is not empty
-			songArr = (JSONArray) parser.parse(new FileReader(JSONFile));
-			
-			//opening the file
-			FileWriter filewriter = new FileWriter(JSONFile);
-			
-			//creating a new JSONObject that will contain the new song details
-			JSONObject newJSONSong = new JSONObject();
-			newJSONSong.put("song_name", newSong.GetSongName());
-			newJSONSong.put("artist_name", newSong.GetArtistName());
-			newJSONSong.put("album_name", newSong.GetAlbumName());
-			newJSONSong.put("year", Integer.toString(newSong.GetYear()));
-			
-			songArr.add(newJSONSong);
-			filewriter.write(songArr.toJSONString());
-			filewriter.flush();
-			filewriter.close();
-			
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	private void initListView() {
-		JSONParser parser = new JSONParser();
-		JSONArray songArr;
-		try {
-			//converting JSON file to a JSONArray object
-			File JSONFile = new File("SongLib.json");
-			if (JSONFile.length() == 0) {
-				//file is empty no need to populate listview
-				return;
-			}
-			
-			//file is not empty
-			songArr = (JSONArray) parser.parse(new FileReader(JSONFile));
-			for (Object o : songArr) {
-				JSONObject song = (JSONObject) o;
-				String name = (String) song.get("song_name");
-				String artist = (String) song.get("artist_name");
-				String album = (String) song.get("album_name");
-				int year = Integer.parseInt((String) song.get("year"));
-				
-				user_display.add(name);
-				if(album == null) {
-					if(year == 0) {
-						songlist.add(new SongDetail(name, artist));
-					}else {
-						songlist.add(new SongDetail(name, artist, year));
-					}
-				}else {
-					if(year == 0) {
-						songlist.add(new SongDetail(name, artist, album));
-					}else {
-						songlist.add(new SongDetail(name, artist, album, year));
-					}
-				}
-			}
-			songlist = SortSongs(songlist, songlist.size());
-			// Update user_display for alphabetical order
-			user_display = FXCollections.observableArrayList();
-			for(SongDetail songer : songlist) {
-				user_display.add(songer.GetSongName());
-			}			
-			listView.setItems(user_display);
-			listView.getSelectionModel().select(0);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-
 }
-
 
