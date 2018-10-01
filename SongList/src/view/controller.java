@@ -41,10 +41,25 @@ public class controller {
 		}			
 		listView.setItems(user_display);
 		listView.getSelectionModel().select(0);
+		if(user_display.size() > 0) {
+			int index = listView.getSelectionModel().getSelectedIndex();
+			if(index < 0) {
+				return;
+			}
+			SongDetail selectedSong = songlist.get(index);
+			song.setText(selectedSong.GetSongName());
+			artist.setText(selectedSong.GetArtistName());
+			if(selectedSong.GetAlbumName() != null) {
+				album.setText(selectedSong.GetAlbumName());
+			}
+			if(selectedSong.GetYear() != 0){
+				year.setText(""+selectedSong.GetYear());
+			}
+		}
 		//getting an exception in thread
 		//TODO figure out why there is an exception in thread
-		/*listView.getSelectionModel().selectedItemProperty().addListener((index) -> 
-				selectItem(mainStage));*/
+		listView.getSelectionModel().selectedItemProperty().addListener((index, x, y) -> 
+				selectItem(mainStage));
 	}
 	
 	private void selectItem(Stage mainStage) {
@@ -55,9 +70,15 @@ public class controller {
 		SongDetail selectedSong = songlist.get(index);
 		song.setText(selectedSong.GetSongName());
 		artist.setText(selectedSong.GetArtistName());
-		album.setText(selectedSong.GetAlbumName());
+		if(selectedSong.GetAlbumName() != null) {
+			album.setText(selectedSong.GetAlbumName());
+		}else {
+			album.setText("");
+		}
 		if(selectedSong.GetYear() != 0){
 			year.setText(""+selectedSong.GetYear());
+		}else {
+			year.setText("");
 		}
 	}
 	
