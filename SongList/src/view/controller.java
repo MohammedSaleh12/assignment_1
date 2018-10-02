@@ -58,11 +58,11 @@ public class controller {
 		}
 		//getting an exception in thread
 		//TODO figure out why there is an exception in thread
-		listView.getSelectionModel().selectedItemProperty().addListener((index, x, y) -> 
-				selectItem(mainStage));
+		listView.getSelectionModel().selectedIndexProperty().addListener((index, x, y) -> 
+				selectItem(listView.getSelectionModel().getSelectedItem()));
 	}
 	
-	private void selectItem(Stage mainStage) {
+	private void selectItem(String itemName) {
 		int index = listView.getSelectionModel().getSelectedIndex();
 		if(index < 0) {
 			return;
@@ -157,6 +157,12 @@ public class controller {
 		for(int i=0;i<f;i++){
 			for(int j=i+1;j<f;j++){
 					if(songlist.get(i).GetSongName().compareToIgnoreCase(songlist.get(j).GetSongName())>0){
+						temp = songlist.get(i);
+						songlist.set(i, songlist.get(j));
+						songlist.set(j, temp);
+					}
+					else if(songlist.get(i).GetSongName().compareToIgnoreCase(songlist.get(j).GetSongName())==0
+							&& songlist.get(i).GetArtistName().compareToIgnoreCase(songlist.get(j).GetArtistName())>0){
 						temp = songlist.get(i);
 						songlist.set(i, songlist.get(j));
 						songlist.set(j, temp);
@@ -341,4 +347,3 @@ public class controller {
 		jsonFile.UpdateJSONFile(edit_song, songlist.get(index));  // Updating JSON file
 	}
 }
-
