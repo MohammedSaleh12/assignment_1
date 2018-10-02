@@ -58,7 +58,7 @@ public class controller {
 		}
 		//getting an exception in thread
 		//TODO figure out why there is an exception in thread
-		listView.getSelectionModel().selectedItemProperty().addListener((index, x, y) -> 
+		listView.getSelectionModel().selectedIndexProperty().addListener((index, x, y) -> 
 				selectItem(mainStage));
 	}
 	
@@ -92,11 +92,21 @@ public class controller {
 			alert.showAndWait();
 			return;
 		}
+		// Ask user for confirmation of the edit
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+			 
+			alert.setTitle("Confirmation");
+			alert.setHeaderText("Are you sure you would like to add this item?");
+			alert.setContentText("");
+			Optional<ButtonType> ans = alert.showAndWait();
+			if(ans.get() == ButtonType.CANCEL) {
+				return;
+			}
 			// Check if the song name and the artist name exists within songlist
 			for (SongDetail songdetail : songlist) {
 				if(song.getText().equals(songdetail.GetSongName()) && artist.getText().equals(songdetail.GetArtistName())) {
 					// TODO error dialog
-					Alert alert = new Alert(AlertType.ERROR);
+					alert = new Alert(AlertType.ERROR);
 					 
 					alert.setTitle("Found duplicate artist name and song name!");
 					alert.setHeaderText("Cannot have enter existing artist name and song name. Sorry!");
@@ -113,7 +123,7 @@ public class controller {
 			if(album_name.isEmpty() && song_year.isEmpty()) {
 				new_song = new SongDetail(song.getText(), artist.getText());
 				songlist.add(new_song);
-				user_display.add(new_song.GetSongName());
+				//user_display.add(new_song.GetSongName());
 			}
 			else if(album_name.isEmpty()) {
 				new_song = new SongDetail(song.getText(), artist.getText(), Integer.valueOf(song_year));
@@ -129,11 +139,7 @@ public class controller {
 			}
 			songlist = SortSongs(songlist, songlist.size());
 			
-			// Update user_display for alphabetical order
-			user_display = FXCollections.observableArrayList();
-			for(SongDetail songer : songlist) {
-				user_display.add(songer.GetSongName());
-			}
+			
 			// get the index where it was newly inserted
 			int count = 0;
 			for(SongDetail songdetail : songlist) {
@@ -142,6 +148,9 @@ public class controller {
 				}
 				count++;
 			}
+			
+			// Update user_display for alphabetical order
+			user_display.add(count, song.getText());
 
 			listView.setItems(user_display);
 			listView.getSelectionModel().select(count);
@@ -169,6 +178,50 @@ public class controller {
 	
 	
 	public void delete(ActionEvent e) {
+		int index = listView.getSelectionModel().getSelectedIndex();
+		if(index == -1) {
+			// User has not selected anything to edit
+			// Alert User
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Cannot delete a song if empty");
+			alert.setHeaderText("Add songs and delete afterwards if you really want to");
+			alert.setContentText("");
+			 
+			alert.showAndWait();
+			return;
+		}
+		// Ask user for confirmation of the edit
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		 
+		alert.setTitle("Confirmation");
+		alert.setHeaderText("Are you sure you would like to delete this item?");
+		alert.setContentText("");
+		Optional<ButtonType> ans = alert.showAndWait();
+		if(ans.get() == ButtonType.CANCEL) {
+			return;
+		}
+		int index_to_select = 0;	
+		
+		if(index == 0) {
+			// then display nothing
+			index_to_select = 0;
+			
+		}
+		
+		// select previous one
+		else if((index) == (songlist.size() - 1)) {
+			index_to_select = index - 1;
+		}
+		
+		else {
+			index_to_select = index;
+		}
+		
+		songlist.remove(index);
+		user_display.remove(index);
+		listView.setItems(user_display);
+		listView.getSelectionModel().select(index_to_select);
+		return;
 		
 	}
 	
