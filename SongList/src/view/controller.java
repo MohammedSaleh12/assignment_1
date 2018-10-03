@@ -22,6 +22,7 @@ public class controller {
 	@FXML Button add;
 	@FXML Button delete;
 	@FXML Button edit;
+	@FXML Button help;
 	@FXML TextField song;
 	@FXML TextField artist;
 	@FXML TextField album;
@@ -59,7 +60,9 @@ public class controller {
 		//getting an exception in thread
 		//TODO figure out why there is an exception in thread
 		listView.getSelectionModel().selectedIndexProperty().addListener((index, x, y) -> 
-			selectItem());
+		selectItem());
+				
+			
 
 	}
 	
@@ -85,6 +88,17 @@ public class controller {
 		}else {
 			year.setText("");
 		}
+	}
+	
+	public void help(ActionEvent e) {
+		Alert alert = new Alert(AlertType.INFORMATION);	 
+		alert.setTitle(" How to Use this Application!");
+		alert.setHeaderText("1) To add a song, populate the text fields and hit the add button. \n2) To delete, select a song and click delete."
+				+ "\n3)To edit, select a song and enter the fields that you would like to change and then click the 'Edit' button.");
+		alert.setContentText("");
+		 
+		alert.showAndWait();
+		return;
 	}
 	
 	public void add(ActionEvent e) {
@@ -140,7 +154,7 @@ public class controller {
 			if(album_name.isEmpty() && song_year.isEmpty()) {
 				new_song = new SongDetail(song.getText(), artist.getText());
 				songlist.add(new_song);
-				user_display.add(new_song.GetSongName());
+				//user_display.add(new_song.GetSongName());
 			}
 			else if(album_name.isEmpty()) {
 				new_song = new SongDetail(song.getText(), artist.getText(), Integer.valueOf(song_year));
@@ -246,7 +260,9 @@ public class controller {
 		listView.setItems(user_display);
 		listView.getSelectionModel().clearSelection();
 		listView.getSelectionModel().select(index_to_select);
-		
+
+		selectItem();
+
 		return;
 		
 	}

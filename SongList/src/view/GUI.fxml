@@ -46,6 +46,7 @@
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -54,6 +55,7 @@
             <Button fx:id="add" mnemonicParsing="false" onAction="#add" text="ADD" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
             <Button fx:id="delete" mnemonicParsing="false" onAction="#delete" text="DELETE" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
             <Button fx:id="edit" mnemonicParsing="false" onAction="#edit" text="EDIT" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
+            <Button fx:id="help" mnemonicParsing="false" onAction="#help" text="How To" GridPane.columnIndex="3" GridPane.halignment="CENTER" />
          </children>
       </GridPane>
    </children>
