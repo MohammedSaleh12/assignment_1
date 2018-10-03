@@ -22,6 +22,7 @@ public class controller {
 	@FXML Button add;
 	@FXML Button delete;
 	@FXML Button edit;
+	@FXML Button help;
 	@FXML TextField song;
 	@FXML TextField artist;
 	@FXML TextField album;
@@ -87,6 +88,17 @@ public class controller {
 		}else {
 			year.setText("");
 		}
+	}
+	
+	public void help(ActionEvent e) {
+		Alert alert = new Alert(AlertType.INFORMATION);	 
+		alert.setTitle(" How to Use this Application!");
+		alert.setHeaderText("1) To add a song, populate the text fields and hit the add button. \n2) To delete, select a song and click delete."
+				+ "\n3)To edit, select a song and enter the fields that you would like to change and then click the 'Edit' button.");
+		alert.setContentText("");
+		 
+		alert.showAndWait();
+		return;
 	}
 	
 	public void add(ActionEvent e) {
