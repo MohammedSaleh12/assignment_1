@@ -59,16 +59,17 @@ public class controller {
 		//getting an exception in thread
 		//TODO figure out why there is an exception in thread
 		listView.getSelectionModel().selectedIndexProperty().addListener((index, x, y) -> 
-<<<<<<< HEAD
-				selectItem(listView.getSelectionModel().getSelectedItem()));
-=======
-				selectItem(mainStage));
->>>>>>> a6da143923d711f9d1ba6c7411646f04e59d68f7
+			selectItem());
+
 	}
 	
-	private void selectItem(String itemName) {
+	private void selectItem() {
 		int index = listView.getSelectionModel().getSelectedIndex();
 		if(index < 0) {
+			song.setText("");
+			artist.setText("");
+			album.setText("");
+			year.setText("");
 			return;
 		}
 		SongDetail selectedSong = songlist.get(index);
@@ -124,6 +125,18 @@ public class controller {
 			String song_year = year.getText();
 			SongDetail new_song;
 			// create new SongDetail and input into both songlist and obsonglist.
+			if(song_year.isEmpty() == false) {
+				if (song_year.matches("[0-9]+") != true) {
+					alert = new Alert(AlertType.ERROR);
+					 
+					alert.setTitle("Wrong Input!");
+					alert.setHeaderText("Please enter only numbers for the year");
+					alert.setContentText("");
+					 
+					alert.showAndWait();
+					return;
+				}
+			}
 			if(album_name.isEmpty() && song_year.isEmpty()) {
 				new_song = new SongDetail(song.getText(), artist.getText());
 				songlist.add(new_song);
@@ -158,7 +171,6 @@ public class controller {
 
 			listView.setItems(user_display);
 			listView.getSelectionModel().select(count);
-			
 			jsonFile.AddSongToJSONFile(new_song);
 
 		
@@ -227,10 +239,14 @@ public class controller {
 			index_to_select = index;
 		}
 		
+		jsonFile.DeleteJSONObject(songlist.get(index));
+		
 		songlist.remove(index);
 		user_display.remove(index);
 		listView.setItems(user_display);
+		listView.getSelectionModel().clearSelection();
 		listView.getSelectionModel().select(index_to_select);
+		
 		return;
 		
 	}
@@ -260,10 +276,23 @@ public class controller {
 				return;
 			}
 		}
+		String song_year = year.getText();
+		if(song_year.isEmpty() == false) {
+			if (song_year.matches("[0-9]+") != true) {
+				Alert alert = new Alert(AlertType.ERROR);
+				 
+				alert.setTitle("Wrong Input!");
+				alert.setHeaderText("Please enter only numbers for the year");
+				alert.setContentText("");
+				 
+				alert.showAndWait();
+				return;
+			}
+		}
 		SongDetail edit_song = songlist.get(index);
-		if(song.getText().equalsIgnoreCase(edit_song.GetSongName())) {  // Seeing if the selected song name equals the song name in the text field
-			if(artist.getText().equalsIgnoreCase(edit_song.GetArtistName())) {  // Seeing if the selected song's artist name equals the artist name in the text field
-				if(album.getText().length() == 0 || album.getText().equalsIgnoreCase(edit_song.GetAlbumName())) {  // Seeing if the selected song's album name equals the album name in the text field 
+		if(song.getText().equals(edit_song.GetSongName())) {  // Seeing if the selected song name equals the song name in the text field
+			if(artist.getText().equals(edit_song.GetArtistName())) {  // Seeing if the selected song's artist name equals the artist name in the text field
+				if(album.getText().length() == 0 || album.getText().equals(edit_song.GetAlbumName())) {  // Seeing if the selected song's album name equals the album name in the text field 
 					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) != edit_song.GetYear()) {  // Seeing if the selected song's year equals the year in the text field
  						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));  // Updated the year of the selected song
 					}else if(year.getText().length() == 0) {
@@ -282,8 +311,8 @@ public class controller {
 				// First check if the new song if edit will make two items have the same artist name and song name
 				for(SongDetail songDetail : songlist){
 					// Check if song name is the same
-					if(songDetail.GetSongName().equalsIgnoreCase(edit_song.GetSongName())) {
-						if(songDetail.GetArtistName().equalsIgnoreCase(artist.getText())) {
+					if(songDetail.GetSongName().equals(edit_song.GetSongName())) {
+						if(songDetail.GetArtistName().equals(artist.getText())) {
 							// There's a duplicate
 							// Alert user
 							Alert alert = new Alert(AlertType.ERROR);
@@ -298,7 +327,7 @@ public class controller {
 					}
 				}
 				// No duplicates if edit is completed
-				if(album.getText().length() == 0 || album.getText().equalsIgnoreCase(edit_song.GetAlbumName())) {
+				if(album.getText().length() == 0 || album.getText().equals(edit_song.GetAlbumName())) {
 					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) != edit_song.GetYear()) {
 						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));  // Updated the year of the selected song
 					}else if(year.getText().length() == 0) {
@@ -315,13 +344,13 @@ public class controller {
 				songlist.get(index).UpdateArtistName(artist.getText());  // Updated the artist name of the selected song
 			}
 		}else {
-			if(artist.getText().equalsIgnoreCase(edit_song.GetArtistName())) {
+			if(artist.getText().equals(edit_song.GetArtistName())) {
 				// User has elected to change just the song name
 				// Need to check if the new song name and artist name are already in the songlist
 				for(SongDetail songDetail : songlist){
 					// Check if song name is the same
-					if(songDetail.GetSongName().equalsIgnoreCase(song.getText())) {
-						if(songDetail.GetArtistName().equalsIgnoreCase(edit_song.GetArtistName())) {
+					if(songDetail.GetSongName().equals(song.getText())) {
+						if(songDetail.GetArtistName().equals(edit_song.GetArtistName())) {
 							// There's a duplicate
 							// Alert the user
 							Alert alert = new Alert(AlertType.ERROR);
@@ -335,7 +364,7 @@ public class controller {
 						}
 					}
 				}
-				if(album.getText().length() == 0 || album.getText().equalsIgnoreCase(edit_song.GetAlbumName())) {
+				if(album.getText().length() == 0 || album.getText().equals(edit_song.GetAlbumName())) {
 					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) != edit_song.GetYear()) {
 						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));  // Updated the year of the selected song
 					}else if(year.getText().length() == 0) {
@@ -354,8 +383,8 @@ public class controller {
 				// First check if the new song if edit will make two items have the same artist name and song name
 				for(SongDetail songDetail : songlist){
 					// Check if song name is the same
-					if(songDetail.GetSongName().equalsIgnoreCase(song.getText())) {
-						if(songDetail.GetArtistName().equalsIgnoreCase(artist.getText())) {
+					if(songDetail.GetSongName().equals(song.getText())) {
+						if(songDetail.GetArtistName().equals(artist.getText())) {
 							// There's a duplicate
 							// Alert the user
 							Alert alert = new Alert(AlertType.ERROR);
@@ -370,7 +399,7 @@ public class controller {
 					}
 				}
 				// No duplicates if edit is completed
-				if(album.getText().length() == 0 || album.getText().equalsIgnoreCase(edit_song.GetAlbumName())) {
+				if(album.getText().length() == 0 || album.getText().equals(edit_song.GetAlbumName())) {
 					if(year.getText().length() != 0 && Integer.parseInt(year.getText()) != edit_song.GetYear()) {
 						songlist.get(index).UpdateYear(Integer.parseInt(year.getText()));   // Updated the year of the selected song
 					}else if(year.getText().length() == 0) {
