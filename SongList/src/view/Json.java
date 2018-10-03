@@ -124,6 +124,44 @@ public class Json {
 		}
 	}
 	
+	public void DeleteJSONObject(SongDetail deletedSong) {
+		JSONParser parser = new JSONParser();
+		JSONArray songArr;
+		try {
+			//converting JSON file to a JSONArray object
+			File JSONFile = new File(fileName);
+			songArr = (JSONArray) parser.parse(new FileReader(JSONFile));
+			JSONObject song = new JSONObject();
+			for (Object o : songArr) {
+				song = (JSONObject) o;
+				if(deletedSong.GetSongName().equalsIgnoreCase((String)song.get("song_name")) &&
+						deletedSong.GetArtistName().equalsIgnoreCase((String) song.get("artist_name"))){
+					break;
+				}
+			}
+			
+			
+			FileWriter filewriter = new FileWriter(JSONFile);
+			songArr.remove(song);
+			
+			
+			filewriter.write(songArr.toString());
+			filewriter.flush();
+			filewriter.close();
+			return;
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public void UpdateJSONFile(SongDetail editSong, SongDetail newSong) {
 		JSONParser parser = new JSONParser();
 		JSONArray songArr;
