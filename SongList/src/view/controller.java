@@ -59,12 +59,9 @@ public class controller {
 		//getting an exception in thread
 		//TODO figure out why there is an exception in thread
 		listView.getSelectionModel().selectedIndexProperty().addListener((index, x, y) -> 
-<<<<<<< HEAD
-				selectItem());
+		selectItem());
 				
-=======
-			selectItem());
->>>>>>> c1e9ae9cb284fcd254621371f338d9f555bb960d
+			
 
 	}
 	
@@ -251,11 +248,9 @@ public class controller {
 		listView.setItems(user_display);
 		listView.getSelectionModel().clearSelection();
 		listView.getSelectionModel().select(index_to_select);
-<<<<<<< HEAD
+
 		selectItem();
-=======
-		
->>>>>>> c1e9ae9cb284fcd254621371f338d9f555bb960d
+
 		return;
 		
 	}
