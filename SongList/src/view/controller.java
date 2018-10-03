@@ -140,7 +140,7 @@ public class controller {
 			if(album_name.isEmpty() && song_year.isEmpty()) {
 				new_song = new SongDetail(song.getText(), artist.getText());
 				songlist.add(new_song);
-				//user_display.add(new_song.GetSongName());
+				user_display.add(new_song.GetSongName());
 			}
 			else if(album_name.isEmpty()) {
 				new_song = new SongDetail(song.getText(), artist.getText(), Integer.valueOf(song_year));
@@ -151,7 +151,7 @@ public class controller {
 				songlist.add(new_song);
 			}
 			else {
-				new_song = new SongDetail(song.getText(), artist.getText());
+				new_song = new SongDetail(song.getText(), artist.getText(), album.getText(), Integer.valueOf(year.getText()));
 				songlist.add(new_song);
 			}
 			songlist = SortSongs(songlist, songlist.size());
